@@ -13,5 +13,14 @@ class TenantMiddleware:
 
             if care_homes.count() == 1:
                 request.care_home = care_homes.first()
+            elif care_homes.exists():
+                selected_care_home_id = request.session.get(
+                    "care_home_id"
+                )
+
+                if selected_care_home_id:
+                    request.care_home = care_homes.filter(
+                        id=selected_care_home_id
+                    ).first()
 
         return self.get_response(request)
