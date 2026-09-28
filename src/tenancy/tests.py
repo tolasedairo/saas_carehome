@@ -80,3 +80,64 @@ class CareHomeDetailTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
+
+
+    def test_member_can_select_care_home(self):
+        self.client.login(
+            username="testcarer",
+            password="test-password",
+        )
+
+        response = self.client.post(
+            reverse(
+                "select_care_home",
+                kwargs={"pk": self.sunrise.pk},
+            )
+        )
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "care_home_detail",
+                kwargs={"slug": "sunrise-care-home"},
+            ),
+        )
+
+        session = self.client.session
+        self.assertEqual(
+            session["care_home_id"],
+            self.sunrise.id,
+        )
+
+    def test_member_cannot_select_another_users_care_home(self):
+        self.client.login(
+            username="testcarer",
+            password="test-password",
+        )
+
+        response = self.client.post(
+            reverse(
+                "select_care_home",
+                kwargs={"pk": self.sunset.pk},
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        session = self.client.session
+        self.assertNotIn("care_home_id", session)
+
+    def test_select_care_home_requires_post(self):
+        self.client.login(
+            username="testcarer",
+            password="test-password",
+        )
+
+        response = self.client.get(
+            reverse(
+                "select_care_home",
+                kwargs={"pk": self.sunrise.pk},
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)

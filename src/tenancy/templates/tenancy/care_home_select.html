@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Care Home</title>
+</head>
+<body>
+    <h1>Select a care home</h1>
+
+    {% for care_home in care_homes %}
+        <div>
+            <strong>{{ care_home.name }}</strong>
+
+            <form method="post" action="{% url 'select_care_home' care_home.id %}">
+                {% csrf_token %}
+                <button type="submit">Select</button>
+            </form>
+        </div>
+    {% empty %}
+        <p>You are not a member of any active care home.</p>
+    {% endfor %}
+</body>
+</html>
